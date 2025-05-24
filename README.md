@@ -41,4 +41,38 @@ SET foto = 'vistas/img/usuarios/default/anonymous.png'
 WHERE id_usuario = 1;
 ```
 
+### 5. Añadir tabla de 'autorizaciones'
+- Se debe crear una tabla llamada `autorizaciones` con las siguientes columnas:
 
+```sql
+-- Creación de la tabla 'autorizaciones'
+CREATE TABLE autorizaciones (
+  id_autorizacion INT PRIMARY KEY AUTO_INCREMENT,
+  id_prestamo INT NOT NULL,
+  id_rol INT NOT NULL,
+  id_usuario INT,
+  fecha_accion TIMESTAMP,
+  motivo_rechazo TEXT,
+
+  UNIQUE (id_prestamo, id_rol),
+  INDEX idx_prestamo (id_prestamo),
+  INDEX idx_rol (id_rol),
+
+  FOREIGN KEY (id_prestamo) REFERENCES prestamos(id_prestamo),
+  FOREIGN KEY (id_rol) REFERENCES roles(id_rol),
+  FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+);
+```
+
+### 6. Insert de datos en la tabla 'autorizaciones'
+- Se debe insertar un registro por cada préstamo existente en la tabla `prestamos`, con los siguientes valores:
+
+```sql
+-- Insertar registros en la tabla 'autorizaciones'
+INSERT INTO autorizaciones (id_prestamo, id_rol, id_usuario, fecha_accion, motivo_rechazo) VALUES
+(1, 3, 50, '2025-05-24 23:25:08', 'No hay disponibilidad de equipos en almacén'),   -- Almacén
+(2, 5, 46, '2025-05-24 23:25:08', NULL),                                             -- Coordinación
+(4, 7, 1,  '2025-05-24 23:25:08', NULL),                                             -- Instructor
+(5, 2, 52, '2025-05-24 23:25:08', 'El préstamo excede el tiempo permitido'),        -- Mesa de ayuda
+(6, 1, 53, '2025-05-24 23:25:08', NULL);                                             -- Líder TIC
+```
