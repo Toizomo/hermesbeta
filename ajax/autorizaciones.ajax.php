@@ -10,6 +10,7 @@ class AjaxAutorizaciones
     =============================================*/
     public $idAutorizacion;
     public $estado;
+    public $id_usuario;
 
     /*=============================================
     MOSTRAR DETALLES DE AUTORIZACIÓN
@@ -23,20 +24,6 @@ class AjaxAutorizaciones
         echo json_encode($respuesta);
     }
 
-    /*=============================================
-    ACTUALIZAR ESTADO DE AUTORIZACIÓN
-    =============================================*/
-    public function ajaxActualizarAutorizacion()
-    {
-        $datos = array(
-            "id_autorizacion" => $this->idAutorizacion,
-            "estado" => $this->estado
-        );
-
-        $controlador = new ControladorAutorizaciones();
-        $respuesta = $controlador->ctrActualizarAutorizacion($datos);
-        echo json_encode($respuesta);
-    }
 }
 
 /*=============================================
@@ -46,14 +33,4 @@ if (isset($_POST["idAutorizacion"]) && !isset($_POST["estado"])) {
     $autorizar = new AjaxAutorizaciones();
     $autorizar->idAutorizacion = $_POST["idAutorizacion"];
     $autorizar->ajaxMostrarAutorizacion();
-}
-
-/*=============================================
-ACTUALIZAR ESTADO DE AUTORIZACIÓN
-=============================================*/
-if (isset($_POST["idAutorizacion"]) && isset($_POST["estado"])) {
-    $actualizar = new AjaxAutorizaciones();
-    $actualizar->idAutorizacion = $_POST["idAutorizacion"];
-    $actualizar->estado = $_POST["estado"];
-    $actualizar->ajaxActualizarAutorizacion();
 }

@@ -33,35 +33,7 @@
                 <th>Acciones</th>
               </tr>
             </thead>
-            <tbody>
-              <?php
 
-              $item = null;
-              $valor = null;
-              $equipos = ControladorEquipos::ctrMostrarEquipos($item, $valor);
-
-              foreach ($equipos as $key => $equipo) {
-                echo '<tr>';
-                echo '<td>' . ($key + 1) . '</td>';
-                echo '<td>' . $equipo['numero_serie']    . '</td>';
-                echo '<td>' . $equipo['etiqueta']        . '</td>';
-                echo '<td>' . $equipo['descripcion']     . '</td>';
-                echo '<td>' . $equipo['ubicacion_nombre']    . '</td>';
-                echo '<td>' . $equipo['categoria_nombre']    . '</td>';
-                echo '<td>' . $equipo['cuentadante_nombre']      . '</td>';
-                echo '<td>' . $equipo['estado_nombre']      . '</td>';
-                // Botón de acciones
-                echo '<td>
-                        <div class="btn-group">
-                          <button title="Editar datos equipo" class="btn btn-default btn-xs btnEditarEquipo bg-warning" idEquipo="' . $equipo["equipo_id"] . '" data-toggle="modal" data-target="#modalEditarEquipo"><i class="fas fa-edit  mr-1 ml-1"></i></button>
-                          <button title="Traspaso de cuentadante" class="btn btn-default btn-xs btnTraspasarEquipo ml-2 bg-success" idEquipoTraspaso="' . $equipo["equipo_id"] . '" data-toggle="modal" data-target="#modalTraspaso"><i class="fas fa-share mr-1 ml-1"></i></button>
-                          <button title="Traspaso de ubicación" class="btn btn-default btn-xs btnTraspasarUbicacion ml-2 bg-info" idEquipoTraspasoUbicacion="' . $equipo["equipo_id"] . '" data-toggle="modal" data-target="#modalTraspasoUbicacion"><i class="fas fa-map-pin mr-1 ml-1"></i></button>
-                        </div>
-                        </td>';
-                echo '</tr>';
-              }
-              ?>
-            </tbody>
           </table>
         </div>
         <!-- /.card-body -->
@@ -109,28 +81,9 @@
             </div>
             <div class="form-group col-lg-12">
               <label for="descripcion">Descripción</label>
-              <textarea class="form-control" id="descripcion" name="descripcion" placeholder="Ej: El equipo se encuentra en perfecto estado..." rows="3" required></textarea>
+              <textarea class="form-control" id="descripcion" name="descripcion" placeholder="Ej: Lenovo ThinkPad" rows="3" required></textarea>
             </div>
             <div class="form-row">
-              <div class="form-group col-lg-6">
-                <label for="ubicacion_id">Ubicación</label>
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
-                  </div>
-                  <?php
-                  $item = null;
-                  $valor = null;
-                  $ubicaciones = ControladorUbicaciones::ctrMostrarUbicaciones($item, $valor);
-                  echo '<select class="form-control" id="ubicacion_id" name="ubicacion_id" required>';
-                  echo '<option value="">Seleccione una ubicación</option>';
-                  foreach ($ubicaciones as $key => $ubicacion) {
-                    echo '<option value="' . $ubicacion["ubicacion_id"] . '">' . $ubicacion["nombre"] . '</option>';
-                  }
-                  echo '</select>';
-                  ?>
-                </div>
-              </div>
               <div class="form-group col-lg-6">
                 <label for="categoria_id">Categoría</label>
                 <div class="input-group">
@@ -150,44 +103,22 @@
                   ?>
                 </div>
               </div>
-            </div>
-            <div class="form-row">
               <div class="form-group col-lg-6">
-                <label for="cuentadante_id">Cuentadante</label>
+                <label for="id_usuario">Cuentadante</label>
                 <div class="input-group">
                   <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                    <span class="input-group-text"><i class="fas fa-list-alt"></i></span>
                   </div>
                   <?php
                   $item = null;
                   $valor = null;
-                  $usuarios = ControladorUsuarios::ctrMostrarUsuarios($item, $valor);
+                  $cuentadantes = ControladorUsuarios::ctrMostrarUsuarios($item, $valor);
                   echo '<select class="form-control" id="id_usuario" name="cuentadante_id" required>';
-                  echo '<option value="">Seleccione una ubicación</option>';
-                  foreach ($usuarios as $key => $usuario) {
-                    if ($usuario["nombre_rol"] != "Aprendiz") {
-                      echo '<option value="' . $usuario["id_usuario"] . '">' . $usuario["nombre"] . " " . "(" . $usuario["nombre_rol"] . ")" . '</option>';
+                  echo '<option value="">Seleccione un cuentadante</option>';
+                  foreach ($cuentadantes as $key => $cuentadante) {
+                    if($cuentadante["nombre_rol"] == "Almacén"){
+                      echo '<option value="' . $cuentadante["id_usuario"] . '">' . $cuentadante["nombre"] . " " . $cuentadante["apellido"] . " (" . $cuentadante["nombre_rol"]. ")" .'</option>';
                     }
-                  }
-                  echo '</select>';
-                  ?>
-                </div>
-              </div>
-
-              <div class="form-group col-lg-6">
-                <label for="id_estado">Estado</label>
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fas fa-info-circle"></i></span>
-                  </div>
-                  <?php
-                  $item = null;
-                  $valor = null;
-                  $estados = ControladorEstados::ctrMostrarEstados($item, $valor);
-                  echo '<select class="form-control" id="id_estado" name="id_estado">';
-                  echo '<option value="">Seleccione un estado</option>';
-                  foreach ($estados as $key => $estado) {
-                    echo '<option value="' . $estado["id_estado"] . '">' . $estado["estado"] . '</option>';
                   }
                   echo '</select>';
                   ?>
@@ -199,10 +130,7 @@
               <button type="submit" class="btn btn-primary">Guardar</button>
             </div>
             <?php
-            // $item = null; NO SON NECESARIAS YA QUE SE ESTÁ CREANDO A A PARTIR DED ALGO NUEVO
-            // $valor = null;
             ControladorEquipos::ctrAgregarEquipos();
-            //exit;
             ?>
           </form>
         </div>
@@ -358,16 +286,16 @@
               </div>
 
               <!-- INPUT CUENTADANTE DESTINO -->
-                <div class="form-group col-lg-12">
-                  <label for="cuentadanteDestino">Cuentadante destino</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fas fa-user-astronaut"></i></span>
-                    </div>
-                    <input type="hidden" id="cuentadanteDestinoId" name="cuentadanteDestinoId">
-                    <input type="text" class="form-control" id="cuentadanteDestino" name="cuentadanteDestino" placeholder="Ej:Jane Doe" readonly>
+              <div class="form-group col-lg-12">
+                <label for="cuentadanteDestino">Cuentadante destino</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fas fa-user-astronaut"></i></span>
                   </div>
+                  <input type="hidden" id="cuentadanteDestinoId" name="cuentadanteDestinoId">
+                  <input type="text" class="form-control" id="cuentadanteDestino" name="cuentadanteDestino" placeholder="Ej:Jane Doe" readonly>
                 </div>
+              </div>
 
             </div>
 
@@ -376,7 +304,9 @@
               <button type="submit" class="btn btn-primary">Realizar traspaso</button>
             </div>
             <?php
-            $cuentadantes = ControladorEquipos::ctrRealizarTraspasoCuentadante();
+            // $cuentadantes = ControladorEquipos::ctrRealizarTraspasoCuentadante();
+            $cuentadantes = new ControladorEquipos();
+            $cuentadantes->ctrRealizarTraspasoCuentadante();
             ?>
           </form>
         </div>
@@ -397,8 +327,9 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
-          <form method="post">
+        <form method="post">
+          <div class="modal-body">
+            <!-- Id del equipo -->
             <input type="hidden" id="idTraspasoUbicacion" name="idTraspasoUbicacion">
 
             <div class="form-row d-flex justify-content-between align-items-center">
@@ -410,50 +341,51 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
                   </div>
-                  <input type="hidden" id="ubicacionActualId" name="ubicacionActualId">
+                  <input type="hidden" id="ubicacionActualId" name="ubicacionActualId" value="">
                   <input type="text" class="form-control" id="ubicacionActual" name="ubicacionActual" readonly>
                 </div>
               </div>
 
-                <!-- ICONO TRASPASO -->
-                <div class="form-group col-lg-1 mt-4">
-                  <span class="input-group-text p-2"><i class="fas fa-exchange-alt d-flex justify-content-center w-100"></i></span>
-                </div>
+              <!-- ICONO TRASPASO -->
+              <div class="form-group col-lg-1 mt-4">
+                <span class="input-group-text p-2"><i class="fas fa-exchange-alt d-flex justify-content-center w-100"></i></span>
+              </div>
 
-                <div class="form-group col-lg-5">
-                  <label for="nuevaUbicacionId">Nueva ubicacion</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
-                    </div>
-                    <?php
-
-                    $item = null;
-                    $valor = null;
-                    $ubicaciones = ControladorUbicaciones::ctrMostrarUbicaciones($item, $valor);
-                    // echo '<input type="hidden" id="nueva_ubicacion_id" name="nueva_ubicacion_id">';
-                    echo '<select class="form-control" id="nuevaUbicacionId" name="nuevaUbicacionId" required>';
-                    echo '<option value="">Seleccione una ubicación</option>';
-                    foreach ($ubicaciones as $key => $ubicacion) {
-                      echo '<option value="' . $ubicacion["ubicacion_id"] . '">' . $ubicacion["nombre"] . '</option>';
-                    }
-                    echo '</select>';
-                    ?>
+              <div class="form-group col-lg-5">
+                <label for="nuevaUbicacionId">Nueva ubicacion</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
                   </div>
+                  <?php
+
+                  $item = null;
+                  $valor = null;
+                  $ubicaciones = ControladorUbicaciones::ctrMostrarUbicaciones($item, $valor);
+                  // echo '<input type="hidden" id="nueva_ubicacion_id" name="nueva_ubicacion_id">';
+                  echo '<select class="form-control" id="nuevaUbicacionId" name="nuevaUbicacionId" required>';
+                  echo '<option value="">Seleccione una ubicación</option>';
+                  foreach ($ubicaciones as $key => $ubicacion) {
+                    echo '<option value="' . $ubicacion["ubicacion_id"] . '">' . $ubicacion["nombre"] . '</option>';
+                  }
+                  echo '</select>';
+                  ?>
                 </div>
+              </div>
 
             </div>
-        </div>
+          </div>
 
-        <div class="modal-footer mt-2 justify-content-between">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-          <button type="submit" class="btn btn-primary">Realizar traspaso</button>
-        </div>
-        <?php
-        $cuentadantes = ControladorEquipos::ctrRealizarTraspasoUbicacion();
-        ?>
+          <div class="modal-footer mt-2 justify-content-between">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn btn-primary">Realizar traspaso</button>
+          </div>
+          <?php
+          // $cuentadantes = ControladorEquipos::ctrRealizarTraspasoUbicacion();
+          $ubicacion = new ControladorEquipos();
+          $ubicacion->ctrRealizarTraspasoUbicacion();
+          ?>
         </form>
       </div>
     </div>
-  </div>
   </div>

@@ -1,4 +1,59 @@
 /* ==================================================
+SERVERSIDE EQUIPOS
+================================================== */
+
+$('#tblEquipos').DataTable({
+    "processing": true,
+    "serverSide": true,
+    "sAjaxSource": "ajax/serverside/serverside.equipos.php",
+    "columns": [
+        { "data": null },
+        { "data": "1" },
+        { "data": "2" },
+        { "data": "3" },
+        { "data": "4" },
+        { "data": "5" },
+        { "data": "6" },
+        { "data": "7" },
+        { "data": null }
+    ],
+    "columnDefs": [
+        {
+            "targets": [0],
+            "render": function(data, type, row, meta) {
+                return meta.row + 1;
+            },
+        },
+        {
+            "targets": [-1],
+            "render": function(row) {
+                return "<div class='btn-group'><button title='Editar datos equipo' class='btn btn-default btn-xs btnEditarEquipo bg-warning' idEquipo='" + row[0] + "' data-toggle='modal' data-target='#modalEditarEquipo'><i class='fas fa-edit  mr-1 ml-1'></i></button><button title='Traspaso de cuentadante' class='btn btn-default btn-xs btnTraspasarEquipo ml-2 bg-success' idEquipoTraspaso='" + row[0] + "' data-toggle='modal' data-target='#modalTraspaso'><i class='fas fa-share mr-1 ml-1'></i></button><button title='Traspaso de ubicación' class='btn btn-default btn-xs btnTraspasarUbicacion ml-2 bg-info' idEquipoTraspasoUbicacion='" + row[0] + "' data-toggle='modal' data-target='#modalTraspasoUbicacion'><i class='fas fa-map-pin mr-1 ml-1'></i></button></div>"
+            }
+        }
+    ],
+    "responsive": true,
+    "autoWidth": false,
+    "lengthChange": true,
+    "lengthMenu":[10, 25, 50, 100],
+    "language": {
+        "lengthMenu": "Mostrar _MENU_ registros",
+        "zeroRecords": "No se encontraron resultados",
+        "info": "Mostrando pagina _PAGE_ de _PAGES_",
+        "infoEmpty": "No hay registros disponibles",
+        "infoFiltered": "(filtrado de _MAX_ total registros)",
+        "search": "Buscar:",
+        "paginate": {
+          "first":      "Primero",
+          "last":       "Ultimo",
+          "next":       "Siguiente",
+          "previous":   "Anterior"
+        },
+    },
+    "buttons": ["csv", "excel", "pdf"],
+    "dom": "lfBrtip"    
+});
+
+/* ==================================================
 BOTÓN PARA EDITAR EQUIPOS
 ================================================== */
 var idEquipoTraspaso;
@@ -83,7 +138,7 @@ $(document).on("click", ".btnTraspasarEquipo", function(){
                     
                     // Llenamos los campos del formulario del modal con los datos recibidos
                     $("#idEditEquipo").val(respuesta["equipo_id"]);
-                    $("#cuentadanteOrigenTraspaso").val(respuesta["nombre"]);
+                    $("#cuentadanteOrigenTraspaso").val(respuesta["cuentadante_nombre"] + " (" + respuesta["nombre_rol"] + ")");
                     $("#ubicacionOrigenTraspaso").val(respuesta["ubicacion_nombre"]);
                 } else {
                     console.error("Respuesta inválida del servidor");
@@ -159,7 +214,7 @@ $(document).on("click", ".btnBuscarCuentadante", function (event){
                     $("#idTraspasoEquipo").val(idEquipoTraspaso);
                     console.log("ESTE ES EL EQUIPO ID AL CUAL VOY A PASAR: ", idEquipoTraspaso);
                     $("#cuentadanteDestinoId").val(resultado["id_usuario"]);
-                    $("#cuentadanteDestino").val(resultado["id_usuario"] + " " + resultado["cuentadante_nombre"]);
+                    $("#cuentadanteDestino").val(resultado["cuentadante_nombre_completo"] + " (" + resultado["nombre_rol"] + ")");
                     // $("#ubicacionTraspaso").val(resultado["ubicacion_id"] + " " + resultado["ubicacion_nombre"]);
                 }
             }
@@ -172,8 +227,9 @@ BOTÓN PARA MOSTRAR LOS DATOS DE LA UBICACIÓN ACTUAL
 ================================================== */
 
 $(document).on("click", ".btnTraspasarUbicacion", function() {
-    idEquipoTraspasoUbicacion = $(this).attr("idEquipoTraspasoUbicacion"); //Id del equipo
-    console.log(idEquipoTraspasoUbicacion);
+    //capturamos el id del boton para llenar el formulario
+    let idEquipoTraspasoUbicacion = $(this).attr("idEquipoTraspasoUbicacion"); //Id del equipo
+    console.log("equipo a trasladar:",idEquipoTraspasoUbicacion);
 
     let datos = new FormData();
     datos.append("idEquipoTraspasoUbicacion", idEquipoTraspasoUbicacion);
@@ -188,9 +244,10 @@ $(document).on("click", ".btnTraspasarUbicacion", function() {
             dataType: "json",
             success: function(resultado){
                 console.log(resultado);
-                // console.log("ubicacion_id hola: ", resultado["ubicacion_id"]);
+                // el idTraspasoUbicacion es el id del equipo en el input hidden (diferente del boton)
+                $("#idTraspasoUbicacion").val(resultado["equipo_id"]); // el id hidden
                 $("#ubicacionActualId").val(resultado["ubicacion_id"]); // el id hidden
-                $("#ubicacionActual").val(resultado["ubicacion_id"] + " " + resultado["nombre_ubicacion"]);
+                $("#ubicacionActual").val(resultado["ubicacion_id"] + " " + resultado["ubicacion_nombre"]);
                 // $("#nuevaUbicacionId").val();
             }
     });
@@ -200,25 +257,24 @@ $(document).on("click", ".btnTraspasarUbicacion", function() {
 BOTÓN PARA AGREGAR AL INPUT DE LA NUEVA UBICACIÓN DEL EQUIPO
 ================================================== */
 
-$(document).on("change", "#nuevaUbicacionId", function() {
-    var nuevaUbicacionId = $(this).val();
-    console.log("id ubicacion destino: ", nuevaUbicacionId);
+// $(document).on("change", "#nuevaUbicacionId", function() {
+//     var nuevaUbicacionId = $(this).val(); // Capturando la ubicación id según el select
+//     // console.log("id ubicacion destino: ", nuevaUbicacionId);
+//     var datos = new FormData();
+//     datos.append("nuevaUbicacionId", nuevaUbicacionId);
 
-    var datos = new FormData();
-    datos.append("nuevaUbicacionId", nuevaUbicacionId);
-
-    $.ajax({
-        url: "ajax/equipos.ajax.php",
-            method: "POST",
-            data: datos,
-            cache: false,
-            contentType: false,
-            processData: false,
-            dataType: "json",
-            success: function(resultado){
-                console.log("RESULTADO: ", resultado);
-                $("#idTraspasoUbicacion").val(resultado["equipo_id"]);
-                $("#nuevaUbicacionId").val(resultado["ubicacion_id"]);
-            }
-    })
-});
+//     $.ajax({
+//         url: "ajax/equipos.ajax.php",
+//             method: "POST",
+//             data: datos,
+//             cache: false,
+//             contentType: false,
+//             processData: false,
+//             dataType: "json",
+//             success: function(resultado){
+//                 console.log("RESULTADO: ", resultado);
+//                 // $("#idTraspasoUbicacion").val(resultado["equipo_id"]);
+//                 $("#nuevaUbicacionId").val(resultado["ubicacion_id"]);
+//             }
+//     })
+// });
