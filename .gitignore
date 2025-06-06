@@ -3,8 +3,11 @@ AdminLTE/
 modelos/conexion.php
 ajax/serverside/serverside.conexion.php
 
-# .htaccess
+# Ignore all files in the root directory
 .htaccess
+
+# Ignore all files in the root directory
+.conexion.php
 
 # Error log
 log.php
@@ -90,3 +93,6 @@ vistas/img/favicon-32x32.png
 vistas/img/favicon.ico
 vistas/img/H_Hermes_logo.png
 vistas/img/site.webmanifest
+modelos/conexion.php
+.gitignore
+modelos/conexion.php

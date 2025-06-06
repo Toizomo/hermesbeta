@@ -3,14 +3,12 @@
   session_start();
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Hermes 2847523 Beta</title>
-
     
     <!-- Google Font: Source Sans Pro -->
     <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"> -->
@@ -67,25 +65,17 @@
 
 </head>
 
-
-
 <body class="hold-transition sidebar-mini login-page">
-<!-- Site wrapper -->
 
-
-<?php
+    <?php
 
   if (isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok") {
-
 
     echo '<script>
       document.addEventListener("DOMContentLoaded", function() {
         document.body.classList.remove("login-page");
       });
     </script>';
-
-
-
 
     echo '<div class="wrapper">';
     include "modulos/cabezote.php";
@@ -108,6 +98,7 @@
           $_GET["ruta"] == "devoluciones" ||
           $_GET["ruta"] == "salidas" ||
           $_GET["ruta"] == "reportes" ||
+          $_GET["ruta"] == "Mantenimiento" ||
           $_GET["ruta"] == "reporte-equipos" ||
           $_GET["ruta"] == "desactivado" ||
           $_GET["ruta"] == "auditoria" ||
@@ -121,14 +112,10 @@
     
     include "modulos/footer.php";
     echo '</div>';
-    echo '<!-- ./wrapper -->';
   } else {
     include "modulos/login.php";
   }
     ?>
-
-
-
 
   <script src="vistas/js/plantilla.js"></script>
   <script src="vistas/js/sedes.js"></script>
@@ -141,8 +128,10 @@
   <script src="vistas/js/solicitudes.js"></script>
   <script src="vistas/js/equipos.js"></script>
   <script src="vistas/js/consultar-solicitudes.js"></script>
+  <script src="vistas/js/devoluciones.js"></script>
   <script src="vistas/js/auditoria.js"></script>
-    <script src="vistas/js/mis-solicitudes.js"></script>
+  <script src="vistas/js/salidas.js"></script>
+  <script src="vistas/js/mis-solicitudes.js"></script>
 
 </body>
 </html>
