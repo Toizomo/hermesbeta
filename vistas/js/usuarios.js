@@ -222,6 +222,39 @@ $(document).on('click', '.btnActivarUsuario', function () {
     var estadoActual = $(this).data('estado'); // el estado al que se va a cambiar
     var boton = $(this);
 
+    // Solo validar si se va a activar
+    if (estadoActual === "activo") {
+        // Consultar si el usuario tiene roles asociados
+        $.ajax({
+            url: "ajax/usuarios.ajax.php",
+            method: "POST",
+            data: { idUsuarioRoles: idUsuario },
+            dataType: "json",
+            success: function (respuesta) {
+                if (respuesta.length === 0) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "No se puede activar",
+                        text: "El usuario no tiene un rol asignado. Asigne un rol antes de activar.",
+                    });
+                    return; // No continúa con la activación
+                } else {
+                    // Si tiene roles, proceder con la activación
+                    cambiarEstadoUsuario(boton, idUsuario, estadoActual);
+                }
+            },
+            error: function () {
+                Swal.fire("Error", "Fallo de conexión al verificar roles", "error");
+            }
+        });
+    } else {
+        // Si se va a desactivar, no hace falta validar roles
+        cambiarEstadoUsuario(boton, idUsuario, estadoActual);
+    }
+});
+
+// Función para cambiar el estado del usuario (tu lógica original)
+function cambiarEstadoUsuario(boton, idUsuario, estadoActual) {
     // Desactivar temporalmente el botón
     boton.prop('disabled', true);
 
@@ -248,17 +281,20 @@ $(document).on('click', '.btnActivarUsuario', function () {
                     boton.data('estado', 'activo');
                 }
                 boton.prop('disabled', false);
+            } else if (respuesta.trim() === "error_sin_rol") {
+                Swal.fire({
+                    icon: "warning",
+                    title: "No se puede activar",
+                    text: "El usuario no tiene un rol asignado. Asigne un rol antes de activar.",
+                });
+                boton.prop('disabled', false).html(textoOriginal);
             } else {
                 Swal.fire("Error", "No se pudo cambiar el estado", "error");
                 boton.prop('disabled', false).html(textoOriginal);
             }
-        },
-        error: function () {
-            Swal.fire("Error", "Fallo de conexión con el servidor", "error");
-            boton.prop('disabled', false).html(textoOriginal);
         }
     });
-});
+}
 
 
 $(document).on("change", "#selectSede", function() {
@@ -381,9 +417,17 @@ $(document).on("click", ".btnSolicitudesUsuario", function() {
     }
 
     // Redirigir a consultar-solicitudes con los parámetros necesarios
-    window.location.href = "consultar-solicitudes?" +
-        "numeroDocumento=" + encodeURIComponent(numeroDocumento) +
-        "&autoBuscar=1";
+    // Construir la URL base
+    let redirectUrl = "consultar-solicitudes?";
+    
+    // Agregar parámetros usando el nombre de parámetro 'cedula' 
+    // para compatibilidad con la función existente
+    redirectUrl += "cedula=" + encodeURIComponent(numeroDocumento) + 
+                  "&origin=usuarios" +
+                  "&autoBuscar=1";
+    
+    // Redireccionar
+    window.location.href = redirectUrl;
 });
 
 // ======================================
@@ -722,4 +766,124 @@ $('#modalEditarUsuario').on('hidden.bs.modal', function() {
     //recargar las vista de usuarios
     // location.reload();
     // Clear all input fields inside the modal
+});
+
+//tooltips
+// Activar tooltips después de cada renderizado de tabla
+$('#tblUsuarios').on('draw.dt', function () {
+    $('[data-toggle="tooltip"]').tooltip();
+});
+
+
+
+//************************************************************
+//
+//  SCRIPT PARA IMPORTAR USUARIOS MASIVAMENTE
+//
+//************************************************************/
+$(document).on("submit", "#modalImportarUsuarios form", function(e) {
+    e.preventDefault();
+
+    var fileInput = $("#archivoUsuarios");
+    var file = fileInput[0].files[0];
+
+    // Validar que se haya seleccionado un archivo
+    if (!file) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Por favor, seleccione un archivo.'
+        });
+        return;
+    }
+
+    // Validar tipo de archivo (CSV o Excel)
+    var validExtensions = ["csv", "xlsx", "xls"];
+    var fileExtension = file.name.split('.').pop().toLowerCase();
+    if ($.inArray(fileExtension, validExtensions) == -1) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Archivo no válido',
+            text: 'Por favor, seleccione un archivo CSV o Excel (.csv, .xlsx, .xls).'
+        });
+        fileInput.val(''); // Limpiar el input de archivo
+        return;
+    }
+
+    var formData = new FormData();
+    formData.append("archivoUsuarios", file);
+    formData.append("accion", "importarUsuariosMasivo"); // Acción para el controlador PHP
+
+    Swal.fire({
+        title: 'Importando usuarios...',
+        text: 'Esto puede tardar un momento.',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    $.ajax({
+        url: "ajax/usuarios.ajax.php", // Ruta al controlador PHP
+        method: "POST",
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function(response) {
+            try {
+                var jsonResponse = JSON.parse(response);
+                if (jsonResponse.status === "success") {
+                    // Crear el archivo para descargar
+                    if (jsonResponse.reporte) {
+                        const contenidoBytes = Uint8Array.from(atob(jsonResponse.reporte), c => c.charCodeAt(0));
+                        var blob = new Blob([contenidoBytes], {type: 'text/plain;charset=utf-8'});
+                        var link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = jsonResponse.nombreArchivo;
+                        
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Importación completada!',
+                            text: jsonResponse.message,
+                            showConfirmButton: true,
+                            confirmButtonText: "Descargar reporte",
+                            showCancelButton: true,
+                            cancelButtonText: "Cerrar"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                link.click();
+                            }
+                            $("#modalImportarUsuarios").modal('hide');
+                            $('#tblUsuarios').DataTable().ajax.reload();
+                            fileInput.val(''); // Limpiar el input de archivo
+                        });
+                    }
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error en la importación',
+                        text: jsonResponse.message || 'Ocurrió un error al importar los usuarios.'
+                    });
+                }
+            } catch (e) {
+                console.error("Raw server response:", response);
+                console.error("Error parsing JSON:", e);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error inesperado',
+                    text: 'La respuesta del servidor no es válida. Por favor, revise el archivo e inténtelo de nuevo.'
+                });
+                console.error("Error parsing response: ", response);
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            Swal.close();
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de conexión',
+                text: 'No se pudo conectar con el servidor. Verifique su conexión e inténtelo de nuevo. Detalles: ' + textStatus + ' - ' + errorThrown
+            });
+            console.error("AJAX error: ", textStatus, errorThrown);
+        }
+    });
 });

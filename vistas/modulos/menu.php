@@ -2,7 +2,7 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
   <!-- Brand Logo -->
   <a href="" class="brand-link">
-    <img src="vistas/img/logo.png" alt="Hermes Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+    <img src="vistas/img/logo/logo_hermes.png" alt="Hermes Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
     <span class="brand-text font-weight-light">Hermes</span>
   </a>
 
@@ -146,7 +146,7 @@
               </li>
               </ul>';
         }
-        if (ControladorValidacion::validarPermisoSesion([19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30])) {
+        if (ControladorValidacion::validarPermisoSesion([1,2,3,4,5,6,32])) {
           echo '
             <li class="nav-item">
             <a href="#" class="nav-link">
@@ -183,16 +183,6 @@
               <ul class="nav nav-treeview">';
         // Solo administradores, líder TIC, mesa de ayuda y almacén 
         if (ControladorValidacion::validarPermisoSesion([19, 20, 21, 22])) {
-          echo '<li class="nav-item">
-              <a href="consultar-solicitudes" class="nav-link">
-              <i class="far fa-circle nav-icon"></i>
-              <span class="badge badge-info right">6+</span>
-              <p>
-              Consultar
-              </p>
-              </a>
-              </li>';
-        }
 
         // "Solicitudes" y "Mis solicitudes" para todos los roles
         echo '<li class="nav-item">
@@ -204,6 +194,17 @@
               </p>
               </a>
               </li>';
+              
+              echo '<li class="nav-item">
+              <a href="consultar-solicitudes" class="nav-link">
+              <i class="far fa-circle nav-icon"></i>
+              <span class="badge badge-info right">6+</span>
+              <p>
+              Consultar
+              </p>
+              </a>
+              </li>';
+        }
         echo '<li class="nav-item">
               <a href="mis-solicitudes" class="nav-link">
               <i class="far fa-circle nav-icon"></i>
@@ -228,18 +229,6 @@
               </li>
             </li>';
         }
-
-        if (ControladorValidacion::validarPermisoSesion([19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30])) {
-          echo '<li class="nav-item">
-            <a href="devoluciones" class="nav-link">
-              <i class="nav-icon fas fa-reply"></i>
-              <span class="badge badge-info right">6+</span>
-              <p>
-              Devoluciones
-              </p>
-            </a>
-            </li>';
-        }
         if (ControladorValidacion::validarPermisoSesion([19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30])) {
           echo '<li class="nav-item">
             <a href="salidas" class="nav-link">
@@ -252,12 +241,25 @@
             </li>';
         }
 
+        if (ControladorValidacion::validarPermisoSesion([19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30])) {
+          echo '<li class="nav-item">
+            <a href="devoluciones" class="nav-link">
+              <i class="nav-icon fas fa-reply"></i>
+              <span class="badge badge-info right">6+</span>
+              <p>
+              Devoluciones
+              </p>
+            </a>
+            </li>';
+        }
+  
+
 
         echo '<li class="nav-item">
-            <a href="reportes" class="nav-link">
-              <i class="nav-icon fas fa-chart-pie"></i>
+            <a href="Mantenimiento" class="nav-link">
+              <i class="nav-icon fas fa-tools"></i>
               <p>
-                Reportes
+                Mantenimiento
               </p>
             </a>
           </li>';
@@ -269,7 +271,7 @@
                 
           ?>
           
-
+        
           <li class="nav-item">
             <a href="reportes" class="nav-link">
               <i class="nav-icon fas fa-chart-pie"></i>
@@ -278,16 +280,6 @@
               </p>
             </a>
           </li>
-          
-          <li class="nav-item">
-            <a href="Mantenimiento" class="nav-link">
-              <i class="nav-icon fas fa-tools"></i>
-              <p>
-                Mantenimiento
-              </p>
-            </a>
-          </li>
-
 
         </ul>
       </nav>

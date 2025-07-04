@@ -1,7 +1,15 @@
 <?php
+session_start(); // <-- Added session_start()
 
 require_once "../controladores/usuarios.controlador.php";
 require_once "../modelos/usuarios.modelo.php";
+require_once "../controladores/roles.controlador.php";
+require_once "../modelos/roles.modelo.php";
+require_once "../controladores/fichas.controlador.php";
+require_once "../modelos/fichas.modelo.php";
+require_once "../controladores/sedes.controlador.php";
+require_once "../modelos/sedes.modelo.php";
+require_once "../vendor/autoload.php"; // <-- Added for PhpSpreadsheet
 
 class AjaxUsuarios
 {
@@ -9,6 +17,7 @@ class AjaxUsuarios
     public $sede;
     public $idUsuario;
     public $item;
+    
 
     public function ajaxFichasSede()
     {
@@ -27,7 +36,21 @@ class AjaxUsuarios
         echo json_encode($respuesta);
     }
 
+    public function ajaxImportarUsuariosMasivo()
+    {
+        header('Content-Type: application/json; charset=utf-8');
+        $respuesta = ControladorUsuarios::ctrImportarUsuariosMasivo();
+        echo $respuesta; // Assuming this returns a JSON response
+        exit; // Ensure to exit after echoing JSON to prevent further output
+    }
 
+
+}
+
+// Bloque para importar usuarios masivamente
+if(isset($_POST["accion"]) && $_POST["accion"] == "importarUsuariosMasivo"){
+    $importar = new AjaxUsuarios();
+    $importar->ajaxImportarUsuariosMasivo(); // This method call includes an exit;
 }
 
 if (isset($_POST["sede"])) {
@@ -54,6 +77,17 @@ if (isset($_POST["idSolicitante"])) {
 if (isset($_POST["idUsuarioEstado"], $_POST["estado"])) {
     $id = $_POST["idUsuarioEstado"];
     $estado = $_POST["estado"];
+
+    // Validación: si se va a activar, verificar que tenga al menos un rol asociado
+    if ($estado === "activo") {
+        $roles = ModeloUsuarios::mdlObtenerRolesPorUsuario($id);
+        if (empty($roles)) {
+            // No tiene roles, no permitir activación
+            echo 'error_sin_rol';
+            exit;
+        }
+    }
+
     $respuesta = ControladorUsuarios::ctrCambiarEstadoUsuario($id, $estado);
     echo $respuesta ? 'ok' : 'error';
     exit;
@@ -71,3 +105,12 @@ if (isset($_POST["idUsuarioCondicion"], $_POST["condicion"])) {
     echo $respuesta;
     exit;
 }
+
+// ajax/usuarios.ajax.php
+if (isset($_POST["idUsuarioRoles"])) {
+    $idUsuario = intval($_POST["idUsuarioRoles"]);
+    $roles = ModeloUsuarios::mdlObtenerRolesPorUsuario($idUsuario);
+    echo json_encode($roles);
+    exit();
+}
+

@@ -1,3 +1,14 @@
+    <?php
+        $item = "id_modulo";
+        $valor = 10;
+        $respuesta = ControladorModulos::ctrMostrarModulos($item, $valor);
+        if ($respuesta["estado"] == "inactivo") {
+            echo '<script>
+                window.location = "desactivado";
+            </script>';
+        }
+
+    ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -22,7 +33,7 @@
                     <div class="card">
                         <div class="card-body">
                             <table id="tblModulos" class="table table-bordered table-striped">
-                                <thead>
+                                <thead class="bg-dark">
                                 <tr>
                                     <th>ID</th>
                                     <th>Nombre</th>

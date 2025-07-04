@@ -20,6 +20,7 @@ $(document).on("click", ".btnVerDetalle", function () {
       $("#detalleFechaInicio").text(respuesta["fecha_inicio"]);
       $("#detalleFechaFin").text(respuesta["fecha_fin"]);
       $("#detalleMotivoPrestamo").text(respuesta["motivo"]);
+    
        
       datosDetalle = new FormData();
       datosDetalle.append("accion", "mostrarPrestamoDetalle");
@@ -48,7 +49,7 @@ $(document).on("click", ".btnVerDetalle", function () {
               ],
               responsive: true,
               autoWidth: false,      
-              scrollX: true,        
+              ordering: true,        
               language: {
                 sProcessing: "Procesando...",
                 sLengthMenu: "Mostrar _MENU_ registros",
@@ -73,3 +74,7 @@ $(document).on("click", ".btnVerDetalle", function () {
     },
   });
 });
+
+//tooltip
+$('[title]').tooltip();
+

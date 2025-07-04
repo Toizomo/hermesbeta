@@ -1,3 +1,14 @@
+      <?php
+        $item = "id_modulo";
+        $valor = 1;
+        $respuesta = ControladorModulos::ctrMostrarModulos($item, $valor);
+        if ($respuesta["estado"] == "inactivo") {
+            echo '<script>
+                window.location = "desactivado";
+            </script>';
+        }
+
+    ?>
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -7,9 +18,15 @@
           <div class="col-sm-6">
             <h1>Inventario</h1>
           </div>
-          <div class="col-sm-6">
-            <button class="btn btn-primary float-right" data-toggle="modal" data-target="#modalRegistrarEquipo">Agregar equipo</button>
-          </div>
+          <?php
+          if (ControladorValidacion::validarPermisoSesion([1])) {
+            echo '
+            <div class="col-sm-6">
+              <button class="btn btn-primary float-right" data-toggle="modal" data-target="#modalRegistrarEquipo">Agregar equipo</button>
+            </div>
+            ';
+          }
+          ?>
         </div>
       </div><!-- /.container-fluid -->
     </section>
@@ -386,6 +403,28 @@
           $ubicacion->ctrRealizarTraspasoUbicacion();
           ?>
         </form>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========== Start Section ==========
+  MODAL PARA HISTÓRICO DEL EQUIPO
+  ========== End Section ========== -->
+  <div class="modal fade" id="modalHistorialEquipo">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-secondary">
+          <h4 class="modal-title">Historial del equipo</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form method="">
+            <h1>En desarrollo...</h1>
+          </form>
+        </div>
       </div>
     </div>
   </div>

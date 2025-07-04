@@ -106,6 +106,16 @@ class ModeloSolicitudes
         return $stmt->fetchAll(PDO::FETCH_KEY_PAIR); // [categoria_id => cantidad]
     }
 
+      public static function mdlContarEquiposPorReserva() {
+        $stmt = Conexion::conectar()->prepare("SELECT categoria_id, COUNT(*) as cantidad
+            FROM equipos
+            WHERE id_estado = 3
+            GROUP BY categoria_id
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_KEY_PAIR); // [categoria_id => cantidad]
+    }
+
     static public function mdlMostrarSolicitudes($item, $valor)
     {
 
@@ -127,7 +137,11 @@ class ModeloSolicitudes
     {
 
         if($item != null){
-            $stmt = Conexion::conectar()->prepare("SELECT p.* FROM prestamos p WHERE p.$item = :$item");
+            $stmt = Conexion::conectar()->prepare("SELECT p.*, u.id_usuario, ur.id_rol, r.nombre_rol FROM prestamos p  
+            JOIN usuarios u ON p.usuario_id = u.id_usuario 
+            JOIN usuario_rol ur ON u.id_usuario = ur.id_usuario
+            JOIN roles r on ur.id_rol = r.id_rol
+            WHERE p.$item = :$item");
             $stmt->bindParam(":" . $item, $valor, PDO::PARAM_INT);
             $stmt->execute();
     
